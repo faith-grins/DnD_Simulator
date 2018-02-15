@@ -21,6 +21,13 @@ class Monk(PCClass):
         if not starting_array:
             starting_array = [10, 15, 13, 12, 14, 8]
         PCClass.__init__(self, race, level, [1, 4, 2, 0, 3, 5], starting_array)
+        #   Set Hit Points
+        self.max_hp = 8 + 5 * (level - 1) + self.con_mod()*level
+        self.current_hp = self.max_hp
+        #   Set Hit Dice
+        self.max_hit_dice = level
+        self.current_hit_dice = self.max_hit_dice
+        self.hit_die = Dice_Rolling.d8
         #   Set Tradition.  Defaults to Open Fist if not provided.
         self.tradition = None
         if level >= 3:

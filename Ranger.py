@@ -22,6 +22,13 @@ class Ranger(PCClass):
         if not starting_array:
             starting_array = [12, 15, 14, 10, 13, 8]
         PCClass.__init__(self, race, level, [1, 2, 4, 3, 0, 5], starting_array)
+        #   Set Hit Points
+        self.max_hp = 10 + 6 * (level - 1) + self.con_mod()*level
+        self.current_hp = self.max_hp
+        #   Set Hit Dice
+        self.max_hit_dice = level
+        self.current_hit_dice = self.max_hit_dice
+        self.hit_die = Dice_Rolling.d10
         #   Set fighting style.  Defaults to Dueling if not provided.
         self.style = None
         if level >= 2:
