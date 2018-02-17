@@ -61,19 +61,22 @@ class Incarnate(PCClass):
     def set_weapons(self, weapons: list):
         self.weapons = weapons
 
-    def attack(self, weapon=0, ac=13):
+    def attack(self, weapon=0, offhand=None, ac=13):
         weapon = self.weapons[weapon]
         num_attacks = 1 if self.level < 5 or self.legacy == Options.AVATAR else 2
-        dual_wield = False
-        if weapon == Weapons.shortsword:
-            num_attacks += 1
+        if offhand:
+            offhand = self.weapons[offhand]
             dual_wield = True
+            num_attacks += 1
+        else:
+            dual_wield = False
         damage = 0
-        bonus = self.proficiency_bonus + weapon.primary_mod(self.abilities)
         for i in range(num_attacks):
             attack_roll = choice(Dice_Rolling.d20) + bonus
+            this_weapon = weapon if i < (num_attacks - 1) else offhand
+            bonus = this_weapon.primary_mod(self.abilities)
             if attack_roll >= ac:
-                hit = weapon.attack(self.abilities)
+                hit = this_weapon.attack(self.abilities)
                 if self.level >= 7 and self.current_essentia > 0:
                     max_bonus = 2
                     while self.current_essentia > 0 and max_bonus > 0:
@@ -81,9 +84,21 @@ class Incarnate(PCClass):
                         self.current_essentia -= 1
                         hit += choice(Dice_Rolling.d8)
                 if i == num_attacks - 1 and dual_wield:
-                    hit -= (bonus - self.proficiency_bonus)
+                    hit -= bonus
                 damage += hit
         return damage
+
+    def long_rest(self):
+        self.current_hp = self.max_hp
+        self.current_essentia = self.max_essentia
+        self.current_hit_dice = max(self.max_hit_dice, self.current_hit_dice + self.max_hit_dice//2)
+
+    def short_rest(self):
+        self.current_essentia = self.max_essentia
+        average_recovery = sum(self.hit_die) / len(self.hit_die) + self.con_mod()
+        while self.current_hp < self.max_hp - average_recovery and self.current_hit_dice > 0:
+            self.current_hit_dice -= 1
+            self.current_hp += choice(self.hit_die) + self.con_mod()
 
 
 # Hank_Defender_of_Peanut_Butter = Paladin(12, Race.HALF_ELF, Options.OATH_OF_VENGEANCE, Options.DEFENSE)

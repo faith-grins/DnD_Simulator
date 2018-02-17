@@ -26,11 +26,11 @@ class Weapon:
         self.die = die
         self.num_dice = num_dice
 
-    def attack(self, abilities: list, reroll=False, versatile=False):
+    def attack(self, abilities: list, reroll=False, twohand=False):
         mod = self.primary_mod(abilities)
         damage = mod
         damage_die = self.die
-        if versatile:
+        if twohand and versatile in self.properties:
             if damage_die == d4:
                 damage_die = d6
             elif damage_die == d6:

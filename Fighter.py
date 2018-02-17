@@ -41,6 +41,7 @@ class Fighter(PCClass):
         if not self.style:
             self.style = Options.DUELING
         #   Set Archetype.  Defaults to Champion if not provided.
+        self.max_superiority_dice = 0
         self.archetype = None
         if level >= 3:
             for o in Options:
@@ -48,11 +49,16 @@ class Fighter(PCClass):
                     self.archetype = o
             if not self.archetype:
                 self.archetype = Options.CHAMPION
+        if self.archetype == Options.BATTLEMASTER:
+            self.max_superiority_dice = 4 if level < 10 else 5
+            self.superiority_die = Dice_Rolling.d8 if level < 10 else Dice_Rolling.d10
+        self.current_superiority_dice = self.max_superiority_dice
         #   Handle Spells/spell slots.
         if self.archetype == Options.ELDRITCH_KNIGHT:
-            self.spell_slots = one_third_caster_slots(level)
+            self.max_spell_slots = one_third_caster_slots(level)
         else:
-            self.spell_slots = None
+            self.max_spell_slots = None
+        self.current_spell_slots = self.max_spell_slots
         self.weapons = []
         default_weapons = {Options.DUELING: Weapons.battleaxe, Options.PROTECTION: Weapons.battleaxe,
                            Options.DEFENSE: Weapons.greatsword, Options.GREAT_WEAPON_FIGHTING: Weapons.greatsword,
@@ -88,6 +94,17 @@ class Fighter(PCClass):
                 if i == num_attacks - 1 and dual_wield and self.style != Options.TWO_WEAPON_FIGHTING:
                     damage -= (bonus - self.proficiency_bonus)
         return damage
+
+    def long_rest(self):
+        self.current_hp = self.max_hp
+        self.current_hit_dice = max(self.max_hit_dice, self.current_hit_dice + self.max_hit_dice//2)
+
+
+    def short_rest(self):
+        average_recovery = sum(self.hit_die) / len(self.hit_die) + self.con_mod()
+        while self.current_hp < self.max_hp - average_recovery and self.current_hit_dice > 0:
+            self.current_hit_dice -= 1
+            self.current_hp += choice(self.hit_die) + self.con_mod()
 
 # Ragnar_McRyan = Fighter(12, Race.HALF_ELF, Options.BATTLEMASTER, Options.DEFENSE)
 # print(Ragnar_McRyan)
