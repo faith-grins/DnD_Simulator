@@ -3,6 +3,25 @@ from enum import IntEnum
 __author__ = 'faith_grins'
 
 
+class Actions(IntEnum):
+    ATTACK = 0
+    DODGE = 1
+    DASH = 2
+    DISENGAGE = 3
+    HIDE = 4
+    CAST_SPELL = 5
+
+
+class Conditions(IntEnum):
+    DODGE = 0
+    PRONE = 1
+    GRAPPLED = 2
+    RESTRAINED = 3
+    STUNNED = 4
+    PETRIFIED = 5
+    CHARMED = 6
+
+
 class ClassList(IntEnum):
     BARBARIAN = 0
     BARD = 1
@@ -51,6 +70,10 @@ class PCClass:
                     break
         self.actions = {}
         self.proficiency_bonus = 2 if self.level < 5 else 3 if self.level < 9 else 4 if self.level < 13 else 5 if self.level < 17 else 6
+        self.temp_hit_points = 0
+        self.max_hit_dice = level
+        self.current_hit_dice = self.max_hit_dice
+        self.conditions = []
 
     def __str__(self):
         return str({'level': self.level, 'abilities': self.abilities, 'race': self.race})
@@ -72,3 +95,7 @@ class PCClass:
 
     def cha_mod(self):
         return -5 + (self.abilities[5] // 2)
+
+    def initiative(self):
+        if Conditions.DODGE in self.conditions:
+            self.conditions.remove(Conditions.DODGE)

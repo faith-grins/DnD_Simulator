@@ -29,9 +29,7 @@ class Fighter(PCClass):
         #   Set Hit Points
         self.max_hp = 10 + 6 * (level - 1) + self.con_mod()*level
         self.current_hp = self.max_hp
-        #   Set Hit Dice
-        self.max_hit_dice = level
-        self.current_hit_dice = self.max_hit_dice
+        #   Set Hit Die
         self.hit_die = Dice_Rolling.d10
         #   Set fighting style.  Defaults to Dueling if not provided.
         self.style = None

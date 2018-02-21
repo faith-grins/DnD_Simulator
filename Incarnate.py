@@ -1,7 +1,6 @@
 from enum import IntEnum
 from Races import Race, ability_adjustment
 from PC_Classes import PCClass
-from Spells import half_caster_slots
 from random import choice
 import Dice_Rolling
 import Weapons
@@ -23,9 +22,7 @@ class Incarnate(PCClass):
         #   Set Hit Points
         self.max_hp = 8 + 5 * (level - 1) + self.con_mod()*level
         self.current_hp = self.max_hp
-        #   Set Hit Dice
-        self.max_hit_dice = level
-        self.current_hit_dice = self.max_hit_dice
+        #   Set Hit Die
         self.hit_die = Dice_Rolling.d8
         #   Set max Essentia
         if level >= 2:
@@ -55,8 +52,8 @@ class Incarnate(PCClass):
                 self.AC = 19
 
     def __str__(self):
-        return str({'level': self.level, 'legacy': self.legacy, 'style': self.style,
-                    'abilities': self.abilities, 'race': self.race, 'spells': self.spell_slots})
+        return str({'level': self.level, 'legacy': self.legacy, 'abilities': self.abilities, 'race': self.race,
+                    'essentia': self.max_essentia})
 
     def set_weapons(self, weapons: list):
         self.weapons = weapons
@@ -72,7 +69,7 @@ class Incarnate(PCClass):
             dual_wield = False
         damage = 0
         for i in range(num_attacks):
-            attack_roll = choice(Dice_Rolling.d20) + bonus
+            attack_roll = choice(Dice_Rolling.d20) + self.proficiency_bonus + weapon.primary_mod(self.abilities)
             this_weapon = weapon if i < (num_attacks - 1) else offhand
             bonus = this_weapon.primary_mod(self.abilities)
             if attack_roll >= ac:
@@ -99,7 +96,3 @@ class Incarnate(PCClass):
         while self.current_hp < self.max_hp - average_recovery and self.current_hit_dice > 0:
             self.current_hit_dice -= 1
             self.current_hp += choice(self.hit_die) + self.con_mod()
-
-
-# Hank_Defender_of_Peanut_Butter = Paladin(12, Race.HALF_ELF, Options.OATH_OF_VENGEANCE, Options.DEFENSE)
-# print(Hank_Defender_of_Peanut_Butter)
