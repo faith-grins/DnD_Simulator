@@ -57,7 +57,7 @@ class Incarnate(PCClass):
 
     def action(self, command=None):
         if not command:
-            command ==
+            command = 'attack'
         if command == 'dodge':
             self.conditions.append(Conditions.DODGE)
 
